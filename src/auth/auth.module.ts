@@ -12,6 +12,7 @@ import { AuthService } from './application/auth.service';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { SessionUseCase } from './application/use-cases/session.use-case';
 import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
+import { JwtAuthGuard } from './infrastructure/guards/auth.guard';
 
 @Module({
   imports: [
@@ -33,7 +34,9 @@ import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
     RegisterUserUseCase,
     SessionUseCase,
     LoginUserUseCase,
+    JwtAuthGuard,
     { provide: 'PasswordHasher', useClass: BcryptAdapter },
   ],
+  exports: [JwtAuthGuard, UserRepository],
 })
 export class AuthModule {}

@@ -64,10 +64,15 @@ export class UserRepository {
     return {
       user: {
         email: user.email,
-        username: user.username,
+        username: user.fullName,
+        identification: user.identification,
       },
       token,
     };
+  }
+
+  async findSessionByToken(token: string) {
+    return await this.sessionUseCase.findSessionByToken(token);
   }
 
   getToken(id: string): string {

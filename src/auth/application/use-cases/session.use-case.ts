@@ -26,6 +26,10 @@ export class SessionUseCase {
     await this.sessionRepository.delete({ token });
   }
 
+  async findSessionByToken(token: string): Promise<Session | null> {
+    return await this.sessionRepository.findOne({ where: { token } });
+  }
+
   private calculateExpiryDate(): Date {
     const date = new Date();
     date.setHours(date.getHours() + 24);

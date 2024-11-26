@@ -1,7 +1,7 @@
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsString, IsUUID } from 'class-validator';
 
 export class SessionUserDto {
-  @IsString()
+  @IsUUID()
   userId: string;
 
   @IsString()

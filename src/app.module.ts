@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
+import { ProductModule } from './products/products.module';
 
 const { env } = process;
 
@@ -20,6 +21,7 @@ const { env } = process;
       synchronize: true,
     }),
     AuthModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

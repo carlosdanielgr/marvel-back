@@ -5,7 +5,8 @@ import { Repository } from 'typeorm';
 
 import { User } from 'src/auth/domain/entities/user.entity';
 import { PasswordHasher } from 'src/auth/domain/domain-services/password-hasher.service';
-import { RegisterUserDto } from 'src/auth/dto';
+import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
+import { SessionUseCase } from './session.use-case';
 
 @Injectable()
 export class RegisterUserUseCase {
@@ -15,6 +16,7 @@ export class RegisterUserUseCase {
     @Inject('PasswordHasher')
     private readonly passwordHasher: PasswordHasher,
     private readonly jwtService: JwtService,
+    private readonly sessionUseCase: SessionUseCase,
   ) {}
 
   async execute(body: RegisterUserDto) {
@@ -31,9 +33,11 @@ export class RegisterUserUseCase {
         password: hashedPassword,
       });
       await this.userRepository.save(user);
+      const token = this.jwtService.sign({ id: user.id });
+      await this.sessionUseCase.create(user, token);
       return {
         username: user.username,
-        token: this.jwtService.sign({ id: user.id }),
+        token,
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -43,5 +47,9 @@ export class RegisterUserUseCase {
         'Unexpected error during user registration: ' + error.message,
       );
     }
+  }
+
+  async getUserById(id: string) {
+    return await this.userRepository.findOne({ where: { id } });
   }
 }

@@ -3,8 +3,10 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Session } from './session.entity';
 
 @Entity('users')
 export class User {
@@ -23,6 +25,9 @@ export class User {
     select: false,
   })
   password: string;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 
   @BeforeInsert()
   checkFieldsBeforeInsert() {

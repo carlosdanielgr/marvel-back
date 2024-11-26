@@ -4,14 +4,16 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from './controllers/auth.controller';
-import { AuthService } from './application/auth.service';
 import { BcryptAdapter } from './infrastructure/adapters/bcrypt-adapter';
 import { User } from './domain/entities/user.entity';
+import { Session } from './domain/entities/session.entity';
+import { AuthService } from './application/auth.service';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
+import { SessionUseCase } from './application/use-cases/session.use-case';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Session]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       useFactory: () => ({
@@ -26,6 +28,7 @@ import { RegisterUserUseCase } from './application/use-cases/register-user.use-c
   providers: [
     AuthService,
     RegisterUserUseCase,
+    SessionUseCase,
     { provide: 'PasswordHasher', useClass: BcryptAdapter },
   ],
 })

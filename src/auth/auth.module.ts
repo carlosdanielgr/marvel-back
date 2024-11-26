@@ -10,6 +10,7 @@ import { Session } from './domain/entities/session.entity';
 import { AuthService } from './application/auth.service';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { SessionUseCase } from './application/use-cases/session.use-case';
+import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SessionUseCase } from './application/use-cases/session.use-case';
     AuthService,
     RegisterUserUseCase,
     SessionUseCase,
+    LoginUserUseCase,
     { provide: 'PasswordHasher', useClass: BcryptAdapter },
   ],
 })

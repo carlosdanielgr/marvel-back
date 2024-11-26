@@ -10,6 +10,6 @@ export class BcryptAdapter implements PasswordHasher {
   }
 
   async compare(plain: string, hashed: string): Promise<boolean> {
-    return bcrypt.compare(plain, hashed);
+    return bcrypt.compareSync(plain, hashed);
   }
 }

@@ -19,10 +19,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   loginUser(@Body() loginUserDto: LoginUserDto) {
-    return {
-      token: 'token',
-    };
-    // return this.authService.login(loginUserDto);
+    return this.authService.login(loginUserDto);
   }
 
   @Post('logout')

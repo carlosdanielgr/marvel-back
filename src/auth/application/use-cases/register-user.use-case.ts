@@ -1,44 +1,29 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
+import { ConflictException, Injectable } from '@nestjs/common';
 
-import { User } from 'src/auth/domain/entities/user.entity';
-import { PasswordHasher } from 'src/auth/domain/domain-services/password-hasher.service';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
-import { SessionUseCase } from './session.use-case';
+import { UserRepository } from 'src/auth/infrastructure/repositories/user.repository';
 
 @Injectable()
 export class RegisterUserUseCase {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @Inject('PasswordHasher')
-    private readonly passwordHasher: PasswordHasher,
-    private readonly jwtService: JwtService,
-    private readonly sessionUseCase: SessionUseCase,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async execute(body: RegisterUserDto) {
     try {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: body.email },
-      });
+      const existingUser = await this.userRepository.findByEmail(body.email);
+
       if (existingUser) {
         throw new ConflictException('Ya se utiliza el correo electrónico');
       }
-      const hashedPassword = await this.passwordHasher.hash(body.password);
-      const user = this.userRepository.create({
-        ...body,
-        password: hashedPassword,
-      });
-      await this.userRepository.save(user);
-      const token = this.jwtService.sign({ id: user.id });
-      await this.sessionUseCase.create(user, token);
-      return {
-        username: user.username,
-        token,
-      };
+
+      const hashedPassword = await this.userRepository.hashPassword(
+        body.password,
+      );
+
+      const user = await this.userRepository.createUser(body, hashedPassword);
+
+      const token = this.userRepository.getToken(user.id);
+
+      return await this.userRepository.sessionCreate(user, token);
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
@@ -47,9 +32,5 @@ export class RegisterUserUseCase {
         'Unexpected error during user registration: ' + error.message,
       );
     }
-  }
-
-  async getUserById(id: string) {
-    return await this.userRepository.findOne({ where: { id } });
   }
 }

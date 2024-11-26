@@ -21,9 +21,7 @@ export class User {
   @Column('text')
   username: string;
 
-  @Column('text', {
-    select: false,
-  })
+  @Column('text')
   password: string;
 
   @OneToMany(() => Session, (session) => session.user)

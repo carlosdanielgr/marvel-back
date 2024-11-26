@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from './controllers/auth.controller';
 import { BcryptAdapter } from './infrastructure/adapters/bcrypt-adapter';
+import { UserRepository } from './infrastructure/repositories/user.repository';
 import { User } from './domain/entities/user.entity';
 import { Session } from './domain/entities/session.entity';
 import { AuthService } from './application/auth.service';
@@ -28,6 +29,7 @@ import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
   controllers: [AuthController],
   providers: [
     AuthService,
+    UserRepository,
     RegisterUserUseCase,
     SessionUseCase,
     LoginUserUseCase,

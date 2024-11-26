@@ -1,37 +1,21 @@
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
 
-import { PasswordHasher } from 'src/auth/domain/domain-services/password-hasher.service';
 import { LoginUserDto } from 'src/auth/dto/login-user.dto';
-import { User } from 'src/auth/domain/entities/user.entity';
-import { SessionUseCase } from './session.use-case';
+import { UserRepository } from 'src/auth/infrastructure/repositories/user.repository';
 
 @Injectable()
 export class LoginUserUseCase {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @Inject('PasswordHasher')
-    private readonly passwordHasher: PasswordHasher,
-    private readonly jwtService: JwtService,
-    private readonly sessionUseCase: SessionUseCase,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async execute(loginUserDto: LoginUserDto) {
     try {
       const { password, email } = loginUserDto;
 
-      const result = await this.userRepository.findOne({
-        where: { email },
-        select: ['email', 'password', 'username'],
-      });
+      const result = await this.userRepository.findByEmail(email);
 
       if (!result)
         throw new UnauthorizedException(
@@ -43,26 +27,14 @@ export class LoginUserUseCase {
           'Las credenciales no son válidas (contraseña)',
         );
 
-      const passwordCompare = await this.passwordHasher.compare(
-        password,
-        result.password,
-      );
-      if (!passwordCompare)
-        throw new UnauthorizedException(
-          'Las credenciales no son válidas (contraseña)',
-        );
+      await this.userRepository.passwordCompare(password, result.password);
 
-      const token = this.jwtService.sign({ id: result.id });
-      await this.sessionUseCase.create(result, token);
-      return {
-        user: {
-          email: result.email,
-          username: result.username,
-        },
-        token,
-      };
+      const token = this.userRepository.getToken(result.id);
+
+      return this.userRepository.sessionCreate(result, token);
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
+
       console.log(error);
       throw new InternalServerErrorException('Please check server logs');
     }

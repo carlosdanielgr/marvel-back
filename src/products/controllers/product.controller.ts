@@ -1,11 +1,12 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/auth.guard';
 import { ProductDto } from '../dto/product.dto';
+import { ProductService } from '../application/products.service';
 
 @Controller('products')
 export class ProductController {
-  constructor() {}
+  constructor(private readonly productService: ProductService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('add-favorite')
@@ -13,12 +14,13 @@ export class ProductController {
     @Body()
     body: ProductDto,
   ) {
-    return 'Product added to favorites';
+    return this.productService.addFavorite(body);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('favorites')
-  getFavorites() {
-    return 'List of favorite products';
+  getFavorites(@Req() req: Request) {
+    const token = req.headers['authorization'];
+    return this.productService.getFavorites(token);
   }
 }

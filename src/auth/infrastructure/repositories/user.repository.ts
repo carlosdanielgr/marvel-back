@@ -60,13 +60,10 @@ export class UserRepository {
   }
 
   async sessionCreate(user: User, token: string) {
+    delete user.password;
     await this.sessionUseCase.create(user, token);
     return {
-      user: {
-        email: user.email,
-        username: user.fullName,
-        identification: user.identification,
-      },
+      user,
       token,
     };
   }

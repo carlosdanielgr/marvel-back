@@ -7,11 +7,15 @@ import { ProductRepository } from 'src/products/infrastructure/repositories/prod
 export class ProductUseCase {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  async addFavorite(product: ProductDto) {
-    return await this.productRepository.addFavorite(product);
+  async addFavorite(product: ProductDto, token: string) {
+    return await this.productRepository.addFavorite(product, token);
   }
 
-  async getFavorites(userId: string) {
-    return await this.productRepository.getFavorites(userId);
+  async getFavorites(token: string) {
+    return await this.productRepository.getFavorites(token);
+  }
+
+  async removeFavorite(id: string) {
+    return await this.productRepository.removeFavorite(id);
   }
 }

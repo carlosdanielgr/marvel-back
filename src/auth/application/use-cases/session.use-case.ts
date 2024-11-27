@@ -27,7 +27,10 @@ export class SessionUseCase {
   }
 
   async findSessionByToken(token: string): Promise<Session | null> {
-    return await this.sessionRepository.findOne({ where: { token } });
+    return await this.sessionRepository.findOne({
+      where: { token },
+      relations: ['user'],
+    });
   }
 
   private calculateExpiryDate(): Date {

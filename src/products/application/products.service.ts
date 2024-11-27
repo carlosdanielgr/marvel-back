@@ -29,11 +29,15 @@ export class ProductService {
     return await lastValueFrom(response).then((res) => res.data);
   }
 
-  async addFavorite(product: ProductDto) {
-    return await this.productUseCase.addFavorite(product);
+  async addFavorite(product: ProductDto, token: string) {
+    return await this.productUseCase.addFavorite(product, token);
   }
 
-  async getFavorites(userId: string) {
-    return await this.productUseCase.getFavorites(userId);
+  async getFavorites(token: string) {
+    return await this.productUseCase.getFavorites(token);
+  }
+
+  async removeFavorite(id: string) {
+    return await this.productUseCase.removeFavorite(id);
   }
 }

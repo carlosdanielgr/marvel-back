@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  Param,
+  Delete,
+} from '@nestjs/common';
 
 import { JwtAuthGuard } from 'src/auth/infrastructure/guards/auth.guard';
 import { ProductDto } from '../dto/product.dto';
@@ -13,8 +22,10 @@ export class ProductController {
   addFavorite(
     @Body()
     body: ProductDto,
+    @Req() req: Request,
   ) {
-    return this.productService.addFavorite(body);
+    const token = req.headers['authorization'];
+    return this.productService.addFavorite(body, token);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -28,5 +39,11 @@ export class ProductController {
   @Get('comics')
   getCommits() {
     return this.productService.getComics();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('remove-favorite/:id')
+  removeFavorite(@Param('id') id: string) {
+    return this.productService.removeFavorite(id);
   }
 }

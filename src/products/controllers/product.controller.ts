@@ -23,4 +23,10 @@ export class ProductController {
     const token = req.headers['authorization'];
     return this.productService.getFavorites(token);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('comics')
+  getCommits() {
+    return this.productService.getComics();
+  }
 }

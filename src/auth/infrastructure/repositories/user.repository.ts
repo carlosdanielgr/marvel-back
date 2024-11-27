@@ -63,7 +63,7 @@ export class UserRepository {
     delete user.password;
     await this.sessionUseCase.create(user, token);
     return {
-      user,
+      ...user,
       token,
     };
   }
